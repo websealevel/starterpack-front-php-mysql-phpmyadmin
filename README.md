@@ -347,6 +347,8 @@ whoami:
 
 Les commentaires sont assez clairs ici. Sur la première ligne on expose le conteneur de manière explicite. La ligne importante est `traefik.http.routers.whoami.rule=Host(`whoami.test`)`. Il attribue un nom de domaine au service de Traefik.
 
+Visitez à présent `whoami.test` depuis votre navigateur favori. Vous devriez tomber sur la réponse du service comme attendu.
+
 ##### Application à notre starterpack
 
 C'est top, tout fonctionne comme prévu. Il ne nous reste plus qu'à rajouter quelques petites choses pour nous simplifier la vie et en finir une fois pour toute avec ces histoires pour avoir notre starterpack. Après cela, on pourra consacrer notre temps à ce qui nous intéresse le plus, coder nos projets.
@@ -439,7 +441,7 @@ Il est composé de deux projets (chacun sur son dépôt):
 - Docker-compose
 - dnsmasq ou autre utilitaire de dns local
 
-Pas de questions, pas d'explication. On va droit au but
+Pas de questions, pas d'explications. On va droit au but.
 
 ### Instructions
 
@@ -451,9 +453,9 @@ Pas de questions, pas d'explication. On va droit au but
    2. Créer un dossier `mysql-data`
    3. Lancer le projet à la racine avec `docker-compose up -d`
    4. Accéder à vos services :
-      1. ${PROJECT_NAME}.back.test pour acceder au backend
-      2. ${PROJECT_NAME}.front.test pour acceder au frontend
-      3. ${PROJECT_NAME}.phpmyadmin.test pour acceder à phpmyadmin et à la base de données. Logger vous avec l'utilisateur `root` (mot de passe `root`)
+      1. `${PROJECT_NAME}.back.test` pour acceder au backend
+      2. `${PROJECT_NAME}.front.test` pour acceder au frontend
+      3. `${PROJECT_NAME}.phpmyadmin.test` pour acceder à phpmyadmin et à la base de données. Logger vous avec l'utilisateur `root` (mot de passe `root`)
 
 ### Démonter le projet
 
