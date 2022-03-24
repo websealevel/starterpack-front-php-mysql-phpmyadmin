@@ -42,7 +42,7 @@ Un starterpack c'est un projet à l'état initial où les cables sont tirés. C'
 
 ## Pas le temps ou l'envie, je suis pressé de l'utiliser
 
-Si vous voulez directement utiliser ce starterpack sans vous soucier des détails de son fonctionnement, pas de problèmes. Peut être que ça vous intéresse pas vraiment ou que vous le ferez plus tard. Rendez-vous dans ce cas directement à la [section mode-pragmatisme-](#mode-pragmatique--utiliser-le-projet-directement).
+Si vous voulez directement utiliser ce starterpack sans vous soucier des détails de son fonctionnement, pas de problèmes. Peut être que ça vous intéresse pas vraiment ou que vous le ferez plus tard. Rendez-vous dans ce cas directement à la [section suivante](#mode-pragmatique--utiliser-le-projet-directement).
 
 ## Docker au lieu de LAMP, être machine indépendant
 
@@ -426,12 +426,12 @@ Voici les instructions à suivre pour vous appropriez le starterpack.
 
 Il est composé de deux projets (chacun sur son dépôt):
 
-- le starterpack à proprement dit, avec nos services Docker. Le starterpack est composé des services suivants
+- le [starterpack](https://github.com/websealevel/starterpack-front-php-mysql-phpmyadmin) à proprement dit, avec nos services Docker. Le starterpack est composé des services suivants
   - `front` : un serveur qui sert du contenu HTML statique
   - `back` : un serveur apache/php pour le backend
   - `phpmyadmin`: pour administrer la base de données
   - `db` : une base de données MySql
-- le reverse-proxy, pour faciliter notre workflow et la gestion de nos projets
+- le [reverse-proxy](https://github.com/websealevel/local-env-docker), pour faciliter notre workflow et la gestion de nos projets
 
 ### Prérequis
 
@@ -443,10 +443,10 @@ Pas de questions, pas d'explication. On va droit au but
 
 ### Instructions
 
-1. Cloner le dépôt [local-docker-env]()
+1. Cloner le dépôt [local-docker-env](https://github.com/websealevel/local-env-docker)
 2. Configurer le dns local en suivant les instructions de cette [section](#mise-en-place-dun-dns-local-avec-dnsmasq). A faire qu'une fois pour tous vos projets
 3. Lancer le projet à la racine avec `docker-compose up -d`. A faire qu'une fois pour tous vos projets. Laissez tourner le conteneur `traefik` pour tous vos projets
-4. Cloner le dépot [starter-pack-front-php-mysql]()
+4. Cloner ce dépot [starter-pack-front-php-mysql](https://github.com/websealevel/starterpack-front-php-mysql-phpmyadmin)
    1. Changer la valeur de `PROJECT_NAME` et donner lui le nom de votre projet (lettres minuscules de préférence)
    2. Créer un dossier `mysql-data`
    3. Lancer le projet à la racine avec `docker-compose up -d`
