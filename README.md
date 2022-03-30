@@ -349,6 +349,15 @@ Les commentaires sont assez clairs ici. Sur la première ligne on expose le cont
 
 Visitez à présent `whoami.test` depuis votre navigateur favori. Vous devriez tomber sur la réponse du service comme attendu.
 
+Enfin un point très important, que j'ai découvert en passant des heures à m'arracher les cheveux à comprendre pourquoi Traefik ne me renvoyait des 404 lorsque j'essayais de faire tourner plusieurs conteneurs en parallèle. Lorsque l'on va travailler sur plusieurs projets dockerisés de manière parallèle il faudra s'assurer que chaque conteneur accessible dispose de son propre router.
+
+Le `router` ici est appelé `whoami`, comme notre service. Chaque router est défini fondamentalement par deux paramètres:
+
+- `entrypoints`: est ce que la requête entrante doit être écoutée pour accéder à ce service ?
+- `rule` : est ce que la requete entrante concerne mon service ?
+  
+Donc lorsque vous voulez monter à la chaine plusieurs projets dans ce setup, il faudra bien labeliser vos services comme suit
+
 ##### Application à notre starterpack
 
 C'est top, tout fonctionne comme prévu. Il ne nous reste plus qu'à rajouter quelques petites choses pour nous simplifier la vie et en finir une fois pour toute avec ces histoires pour avoir notre starterpack. Après cela, on pourra consacrer notre temps à ce qui nous intéresse le plus, coder nos projets.
@@ -408,11 +417,12 @@ A présent on peut labeliser nos services Docker sous la clef `labels` de notre 
       - web
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.front.rule=Host(`${PROJECT_NAME}.front.${TRAEFIK_DOMAIN}`)"
-      - "traefik.http.routers.front.entrypoints=web"
+      - "traefik.http.routers.${PROJECT_NAME}-front.rule=Host(`${PROJECT_NAME}.front.${TRAEFIK_DOMAIN}`)"
+      - "traefik.http.routers.${PROJECT_NAME}-front.entrypoints=web"
 ```
 
-Adapter le nom de domaine selon vos préférences. On fait la même chose pour les autres services. On relance le projet avec docker-compose up -d et si on visite `foo.front.test`, normalement, on est servis !
+
+Adapter le nom de domaine selon vos préférences. On fait la même chose pour les autres services. On relance le projet avec `docker-compose up -d` et si on visite `foo.front.test`, normalement, on est servis !
 
 Et voilà, c'est fini ! Enfin, tout peut commencer. A présent vous pouvez dupliquer ce starterpack autant que vous le souhaitez, d'ailleurs changer même les services et changer complètement de stack. Vous avez toutes les clefs pour monter votre stack préféré sur des conteneurs accessibles via un nom de domaine facile à retenir et ne rentrant pas en conflit avec tous vos autres projets.
 

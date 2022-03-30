@@ -7,13 +7,13 @@ services:
     restart: always
     volumes:
       - ./front/:/usr/local/apache2/htdocs/:rw
-    container_name: minimal-front
+    container_name: ${PROJECT_NAME}-front
     networks:
       - web
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.front.rule=Host(`${PROJECT_NAME}.front.${TRAEFIK_DOMAIN}`)"
-      - "traefik.http.routers.front.entrypoints=web"
+      - "traefik.http.routers.${PROJECT_NAME}-front.rule=Host(`${PROJECT_NAME}.front.${TRAEFIK_DOMAIN}`)"
+      - "traefik.http.routers.${PROJECT_NAME}-front.entrypoints=web"
 
   #Le serveur php
   back:
@@ -25,11 +25,11 @@ services:
       - web
     volumes:
       - ./back/:/var/www/html/:rw
-    container_name: minimal-back
+    container_name: ${PROJECT_NAME}-back
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.back.rule=Host(`${PROJECT_NAME}.back.${TRAEFIK_DOMAIN}`)"
-      - "traefik.http.routers.back.entrypoints=web"
+      - "traefik.http.routers.${PROJECT_NAME}-back.rule=Host(`${PROJECT_NAME}.back.${TRAEFIK_DOMAIN}`)"
+      - "traefik.http.routers.${PROJECT_NAME}-back.entrypoints=web"
     #Nous donne les droits en ecriture au volume (par défaut donné à root, pas cool)
     user: "${UID}:${GID}"
 
@@ -42,13 +42,13 @@ services:
     environment:
       PMA_HOST: minimal-db
       PMA_ARBITRARY: 0
-    container_name: minimal-pma
+    container_name: ${PROJECT_NAME}-pma
     networks:
       - web
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.phpmyadmin.rule=Host(`phpmyadmin.${PROJECT_NAME}.${TRAEFIK_DOMAIN}`)"
-      - "traefik.http.routers.phpmyadmin.entrypoints=web"
+      - "traefik.http.routers.${PROJECT_NAME}-phpmyadmin.rule=Host(`phpmyadmin.${PROJECT_NAME}.${TRAEFIK_DOMAIN}`)"
+      - "traefik.http.routers.${PROJECT_NAME}-phpmyadmin.entrypoints=web"
 
   #Le serveur de la base de données mysql
   db:
@@ -60,8 +60,7 @@ services:
       MYSQL_PASSWORD: "password"
       #Password pour l'user root (appelé root par défaut)
       MYSQL_ROOT_PASSWORD: "password"
-    container_name:
-      minimal-db
+    container_name: ${PROJECT_NAME}-db
       # Where our data will be persisted
     volumes:
       - ./mysql-data:/var/lib/mysql
