@@ -8,7 +8,7 @@
     - [Services : de quoi a-t-on besoin ?](#services--de-quoi-a-t-on-besoin-)
       - [Un backend](#un-backend)
       - [Une base de données MySQL](#une-base-de-données-mysql)
-      - [PhpMyAdmin c'est user-friendly](#phpmyadmin-cest-user-friendly)
+      - [Adminer](#adminer)
       - [Un serveur front](#un-serveur-front)
     - [Communication _entre_ nos services](#communication-entre-nos-services)
     - [Communication _avec_ nos services](#communication-avec-nos-services)
@@ -83,17 +83,14 @@ Rien de plus à dire pour le moment, passons à la base de données.
 
 Le service `db` est un conteneur MySQL. On renseigne ici les valeurs des variables d'environnement [mises à disposition par l'image officielle](https://hub.docker.com/_/mysql). On doit également dire au conteneur où stocker sur notre machine hôte le système de fichiers du SGBD. On le fait avec la ligne
 
+
+~~~yaml
     volumes: - ./mysql-data:/var/lib/mysql
+~~~
 
-#### PhpMyAdmin c'est user-friendly
+#### Adminer
 
-Un monte un service `phpmyadmin` pour se faciliter la vie lorsque l'on voudra travailler sur la base de données. Pas envie de faire ça via la CLI, du moins pas pour le moment. On initialise des variables d'environnement [mises à disposition par l'image officielle](https://hub.docker.com/r/phpmyadmin/phpmyadmin/). Lorsque l'on se rend sur la page d'une image Docker il est toujours utile d'aller consulter la section _Environment variables summary_. Elle nous liste toutes les variables d'environnement disponibles pour configurer notre conteneur.
-
-Phpmyadmin va devoir communiquer avec le service `db` (sinon il sert à rien). Nous verrons comment faire communiquer nos services plus en détail dans la [section suivante](#communication-entre-nos-services). Cela dit nous avons ici une directive importante
-
-    PMA_HOST:minimal-db
-
-`PMA_HOST` est une variable d'environnement de l'image de phpmyadmin. Elle permet de définir l'hôte de la base de données (c'est à dire la machine où elle se trouve). On remarque qu'on a mis `minimal-db` directement ici, à savoir le nom de notre conteneur (on aurait pu mettre le nom du service directement). En effet, la doc de Compose nous dit que _un conteneur appartenant à un réseau peut communiquer avec tous les conteneurs du même réseau via leur nom d'hôte qui est identique a leur nom de conteneur_. Autrement dit le hostname est équivalent sur le réseau au nom du conteneur, donc je peux le renseigner directement dans `PMA_HOST`.
+Un monte un service `adminer` pour se faciliter la vie lorsque l'on voudra travailler sur la base de données. Pas envie de faire ça via la CLI, du moins pas pour le moment. Rien de spécial ici.
 
 Ce service dépend du service `db` donc on l'explicite également.
 
@@ -101,7 +98,9 @@ Ce service dépend du service `db` donc on l'explicite également.
 
 On peut se rajouter un service `front` qui simulera un client sur un autre domaine que notre backend. Ce service servira du HTML de manière statique. On se sert de [l'image officielle httpd](https://hub.docker.com/_/httpd), on sert le contenu du dossier `front` en faisant correspondre le dossier `front` au [`DocumentRoot`](https://httpd.apache.org/docs/2.4/fr/urlmapping.html) d'Apache
 
+~~~yaml
     volumes: - ./front/:/usr/local/apache2/htdocs/:rw
+~~~
 
 Le `DocumentRoot` d'Apache définit par défaut quel fichier sera servi par une reqûete. Après tout, **le web consiste à accéder à des fichiers sur des machines connectées au réseau**. Prenons l'exemple d'une reqûete qui arrive sur votre serveur faite depuis un navigateur de la forme
 
@@ -117,15 +116,65 @@ Sur cette image il vaut par défaut `/usr/local/apache2/htdocs` et non `/var/www
 Bien, maintenant que nos services sont individuellement prêts et tous sur le même réseau il ne reste qu'à s'assurer qu'ils pussent communiquer entre eux. Listons les relations entre services ici :
 
 - `back` doit acceder à `db`
-- `phpmyadmin` doit acceder à `db`
+- `adminer` doit acceder à `db`
 - `front` doit acceder à `back`
 
-Déjà, on va tous les mettre sur le même réseau personalisé `web` avec la directive
+On va mettre tous nos conteneurs sur le réseau `web` qui a été crée pour que le conteneur Traefik puisse communiquer avec tous nos conteneurs. Nous verrons cela à la section [suivante](#résoudre-tous-ces-problèmes-dns-local-et-reverse-proxy).
 
+
+~~~yaml
+networks:
+  project_php:
+  web:
+    external: true
+~~~
+
+On indique que le réseau `web` est `external` ce qui veut dire qu'il existe déjà. On ne veut pas en recréer un autre. On ajoute égalempent un réseau propre au projet `project_php`. Docker va aitomatiquement créer un réseau de la forme `${COMPOSE_PROJECT_NAME}_project_php`, où `${COMPOSE_PROJECT_NAME}` est le nom du dossier dans lequel se trouve votre projet par défaut. On a donc un réseau unique pour chaque projet.
+
+On veut à présent exposer tous les conteneurs sur le réseau `web` que l'on peut se représenter comme le réseau public, accessible au monde exterieur, sauf la base de données. Aucun raison qu'on puisse y accèder depuis le monde exterieur. Non recommandé. C'est le service `back` qui va communiquer avec la base de données. Donc on met tout le monde sous `web` et `project_php`, sauf `db` que l'on met que sous `project_php`. Cela donne
+
+
+~~~yaml
+services:
+  #Le serveur front (html static)
+  front:
+    ...
     networks:
+      - project_php
       - web
 
-Comme on l'a vu précédemment, tous les conteneurs appartenant au même réseau peuvent communiquer via leur nom d'hôte ou nom de conteneur. Donc normalement on est bon.
+  #Le serveur php
+  back:
+    ...
+    networks:
+      - project_php
+      - web
+
+  #Le serveur de la base de données mysql
+  db:
+    ...
+    networks:
+    - project_php
+
+  #Le serveur de adminer
+  adminer:
+    ...
+    networks:
+      - web
+      - project_php
+
+...
+
+networks:
+  project_php:
+  web:
+    external: true
+~~~
+
+
+Sous la clef `networks` on dit à nos conteneurs de [rejoindre un réseau web pré existant](https://docs.docker.com/compose/networking/#use-a-pre-existing-network) et à Docker qu'on déclare un réseau par défaut `project_php`.
+
+Comme on l'a vu précédemment, tous les conteneurs appartenant au même réseau peuvent communiquer via leur nom d'hôte ou nom de conteneur. Donc normalement on est bon. 
 
 ### Communication _avec_ nos services
 
@@ -138,17 +187,7 @@ Un port c'est une entité logique (et non matérielle) qui agit comme un identif
 
 Ici, on associe le port `9000` de notre machine au port `80` de notre conteneur, le port par défaut pour le protocole HTTP. Pourquoi ai-je choisi le port `9000` ? Aucune idée, il fait juste partie des ports disponibles.
 
-Les services `back`, `phpmyadmin` et `front` sont tous des serveurs HTTP qui communiquent via le port `80`, donc pour chacun d'entre eux je map un port de ma machine hôte à leur port 80. Et pour le service `db` ? Par défaut, MySQL utilise le port `3306`.
-
-Enfin, à la fin de notre docker-compose.yml on déclare une dernière configuration
-
-```
-networks:
-  web:
-    external: true
-```
-
-Elle dit à nos conteneurs de [rejoindre un réseau web pré existant](https://docs.docker.com/compose/networking/#use-a-pre-existing-network) et à Docker de ne pas créer de réseau par défaut. Cela pour améliorer la lisibilité de nos réseaux gérés par Docker et pourquoi pas permettre à différents projets de communiquer facilement entre eux.
+Les services `back`, `adminer` et `front` sont tous des serveurs HTTP qui communiquent via le port `80`, donc pour chacun d'entre eux je map un port de ma machine hôte à leur port 80. Et pour le service `db` ? Par défaut, MySQL utilise le port `3306`.
 
 ## Le starterpack en action
 
@@ -156,22 +195,23 @@ Elle dit à nos conteneurs de [rejoindre un réseau web pré existant](https://d
 
 Maintenant que tout est bien configuré, lançons le projet avec un
 
-    docker-compose up -d
 
+~~~bash
+    docker-compose up -d
+~~~
 ### Testons le projet
 
 Si c'est la première fois que vous lancez la commande Docker va construire les conteneurs à partir des images Docker, et ensuite il va les instancier. Vérifions deux ou trois petites choses.
 
 Tapez la commande
 
+~~~bash
     docker ps -a
+~~~
 
 Elle vous listera tous les conteneurs en activité à la racine du projet, avec différentes informations.
 
-Ouvrez 3 onglets dans votre navigateur favori et demandez `localhost:9000` (front), `localhost:9001` (back), `localhost:90002`(phpmyadmin). Vous devriez visitez le front, le back et arriver sur Phpmyadmin. Logez vous soit avec l'utilisateur soit avec root, vous devriez accéder à la base de données `mydatabase`.
-
-//PING LE BACK DEPUIS LE FRONT
-//PING LA BASE DE DONNEES depuis le back
+Ouvrez 3 onglets dans votre navigateur favori et demandez `localhost:9000` (front), `localhost:9001` (back), `localhost:90002`(adminer). Vous devriez visitez le front, le back et arriver sur adminer. Logez vous avec l'utilisateur `root` (mot de passe `root`).
 
 ### Arrêtons le projet
 
@@ -214,12 +254,12 @@ Nous l'avons dit dans la [section précédente](#aller-un-peu-plus-loin-acceder-
 
 Pour régler ce problème on va utiliser un autre outil, le service [Traefik](https://doc.traefik.io/traefik/). On va s'en servir comme [reverse proxy](https://fr.wikipedia.org/wiki/Proxy_inverse). Il servira d'intermédiaire pour accéder à nos conteneurs Docker.
 
-Illustrons concrètement ce que l'on cherche à faire: je démarre un projet `foobar` avec mon starterpack. J'ai déjà deux autres projets sur lesquels je travaille issus de mon pack. Je m'en soucie pas. J'accède par exemple à mon service `back` depuis mon navigateur en requêtant `back.foobar.test`. Le domaine `.test` [est recommandé](https://fr.wikipedia.org/wiki/.test) car il a été reservé pour offrir un domaine qui ne rentre pas en conflit avec des domaines réels d'Internet. Pour accéder à phpmyadmin de mon projet je tape `phpmyadmin.foobar.test`. Etc... Pratique non ? D'une part je n'ai plus besoin de savoir quels ports sont déjà réservés sur tel ou tel projet ni de les gérer. Enfin `back.foobar.test` est plus explicite que `localhost:90001`. Si je me donne une règle de syntaxe je peux retrouver n'importe quel conteneur de n'importe quel projet facilement six mois plus tard.
+Illustrons concrètement ce que l'on cherche à faire: je démarre un projet `foobar` avec mon starterpack. J'ai déjà deux autres projets sur lesquels je travaille issus de mon pack. Je m'en soucie pas. J'accède par exemple à mon service `back` depuis mon navigateur en requêtant `back.foobar.test`. Le domaine `.test` [est recommandé](https://fr.wikipedia.org/wiki/.test) car il a été reservé pour offrir un domaine qui ne rentre pas en conflit avec des domaines réels d'Internet. Pour accéder à adminer de mon projet je tape `adminer.foobar.test`. Etc... Pratique non ? D'une part je n'ai plus besoin de savoir quels ports sont déjà réservés sur tel ou tel projet ni de les gérer. Enfin `back.foobar.test` est plus explicite que `localhost:90001`. Si je me donne une règle de syntaxe je peux retrouver n'importe quel conteneur de n'importe quel projet facilement six mois plus tard.
 
 Pour y parvenir, on va se servir d'un serveur dns local et d'un reverse-proxy. On va mettre en place un service qui va essayer de résoudre le nom de domaine à partir d'une configuration sur votre machine avant d'interroger un vrai serveur dns d'internet. Quand on tapera l'url `back.foobar.test`, notre système de dns va donc regarder s'il trouve un pattern, ici le domaine `.test` et tous les [sous-domaines associés](https://fr.wikipedia.org/wiki/Nom_de_domaine), par exemple `back.foobar.test`. S'il le trouve, il va rediriger la requête faite depuis notre navigateur vers notre machine au lieu d'aller requêter l'Internet. C'est là que notre reverse proxy rentre en jeu: il va recevoir la requete, et s'il est bien configuré, va résoudre le nom de domaine pour nous servir le conteneur Docker de notre projet. Voilà le plan:
 
 - utiliser le domaine reservé `.test` pour capter tous les sous-domaines (aka tous nos projets de dev) et renvoyer les reqûetes vers notre machine. C'est le job de notre service dns local
-- intercepter les requêtes entrant sur notre machine pour les résoudre et les rediriger vers le bon conteneur Docker, par exemple le phpmyadmin d'un de nos projets. C'est le job du [reverse-proxy](https://fr.wikipedia.org/wiki/Proxy_inverse), il agit comme un portique par lequel les requêtes entrantes vont devoir passer pour être traitées selon nos besoins.
+- intercepter les requêtes entrant sur notre machine pour les résoudre et les rediriger vers le bon conteneur Docker, par exemple le adminer d'un de nos projets. C'est le job du [reverse-proxy](https://fr.wikipedia.org/wiki/Proxy_inverse), il agit comme un portique par lequel les requêtes entrantes vont devoir passer pour être traitées selon nos besoins.
 
 Pour mettre en place ce système on va avoir besoin de conteneurs Docker car on va conteneurisé le reverse proxy (et oui, encore, le minimum sur notre machine). Pour cela, on va créer un nouveau dépôt en dehors de notre starterpack. Un projet, un dépôt, c'est la règle. Ce projet vivra sa vie de manière indépendante sur votre machine et pourra servir à tous vos projets en local et non seulement à ceux réalisés avec votre starterpack. Quand on l'aura cablé, on le lancera une fois pour toute et vous n'y retoucherez plus jamais.
 
@@ -403,7 +443,7 @@ PROJECT_NAME=foo
 
 `TRAEFIK_DOMAIN` doit avoir la même valeur que celle définie dans le dépôt local-docker-env. Et `PROJECT_NAME` sera le nom unique de votre projet.
 
-A présent on peut labeliser nos services Docker sous la clef `labels` de notre starterpack (à savoir `back`, `front`, `phpmyadmin`) comme on l'a fait avec le service `whoami`. Par exemple pour le service front
+A présent on peut labeliser nos services Docker sous la clef `labels` de notre starterpack (à savoir `back`, `front`, `adminer`) comme on l'a fait avec le service `whoami`. Par exemple pour le service front
 
 ```
   #Le serveur front (html static)
@@ -417,12 +457,14 @@ A présent on peut labeliser nos services Docker sous la clef `labels` de notre 
       - web
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.${PROJECT_NAME}-front.rule=Host(`${PROJECT_NAME}.front.${TRAEFIK_DOMAIN}`)"
+      - "traefik.http.routers.${PROJECT_NAME}-front.rule=Host(`front.${PROJECT_NAME}.${TRAEFIK_DOMAIN}`)"
       - "traefik.http.routers.${PROJECT_NAME}-front.entrypoints=web"
 ```
 
 
 Adapter le nom de domaine selon vos préférences. On fait la même chose pour les autres services. On relance le projet avec `docker-compose up -d` et si on visite `front.foo.test`, normalement, on est servis !
+
+Vous pouvez y tester, via un petit formulaire, la communication entre le front et le back. Le back teste la connexion à la base de données et retourne la réponse. Si tout se passe bien vous devriez obtenir la réponse `Hello World ! La connexion à la base de données a réussi !`. Si c'est le cas, bravo ! Si c'est pas le cas, courage. Moi aussi j'ai galéré à monter ce pack... Ou alors j'ai oublié de mentionner une configuration et n'hésitez pas à ouvrir une issue sur le dépôt !
 
 Et voilà, c'est fini ! Enfin, tout peut commencer. A présent vous pouvez dupliquer ce starterpack autant que vous le souhaitez, d'ailleurs changer même les services et changer complètement de stack. Vous avez toutes les clefs pour monter votre stack préféré sur des conteneurs accessibles via un nom de domaine facile à retenir et ne rentrant pas en conflit avec tous vos autres projets.
 
@@ -441,7 +483,7 @@ Il est composé de deux projets (chacun sur son dépôt):
 - le [starterpack](https://github.com/websealevel/starterpack-front-php-mysql-phpmyadmin) à proprement dit, avec nos services Docker. Le starterpack est composé des services suivants
   - `front` : un serveur qui sert du contenu HTML statique
   - `back` : un serveur apache/php pour le backend
-  - `phpmyadmin`: pour administrer la base de données
+  - `adminer`: pour administrer la base de données
   - `db` : une base de données MySql
 - le [reverse-proxy](https://github.com/websealevel/local-env-docker), pour faciliter notre workflow et la gestion de nos projets
 
@@ -463,9 +505,9 @@ Pas de questions, pas d'explications. On va droit au but.
    2. Créer un dossier `mysql-data`
    3. Lancer le projet à la racine avec `docker-compose up -d`
    4. Accéder à vos services :
-      1. `${PROJECT_NAME}.back.test` pour acceder au backend
-      2. `${PROJECT_NAME}.front.test` pour acceder au frontend
-      3. `${PROJECT_NAME}.phpmyadmin.test` pour acceder à phpmyadmin et à la base de données. Logger vous avec l'utilisateur `root` (mot de passe `root`)
+      1. `front.${PROJECT_NAME}.test` pour acceder au backend
+      2. `back.${PROJECT_NAME}.test` pour acceder au frontend
+      3. `adminer.${PROJECT_NAME}.test` pour acceder à adminer et à la base de données. Logger vous avec l'utilisateur `root` (mot de passe `root`)
 
 ### Démonter le projet
 
