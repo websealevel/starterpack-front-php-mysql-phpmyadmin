@@ -422,7 +422,7 @@ A présent on peut labeliser nos services Docker sous la clef `labels` de notre 
 ```
 
 
-Adapter le nom de domaine selon vos préférences. On fait la même chose pour les autres services. On relance le projet avec `docker-compose up -d` et si on visite `foo.front.test`, normalement, on est servis !
+Adapter le nom de domaine selon vos préférences. On fait la même chose pour les autres services. On relance le projet avec `docker-compose up -d` et si on visite `front.foo.test`, normalement, on est servis !
 
 Et voilà, c'est fini ! Enfin, tout peut commencer. A présent vous pouvez dupliquer ce starterpack autant que vous le souhaitez, d'ailleurs changer même les services et changer complètement de stack. Vous avez toutes les clefs pour monter votre stack préféré sur des conteneurs accessibles via un nom de domaine facile à retenir et ne rentrant pas en conflit avec tous vos autres projets.
 

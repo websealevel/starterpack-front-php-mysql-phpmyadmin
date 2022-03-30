@@ -39,7 +39,7 @@ services:
 
   #Le serveur de la base de données mysql
   db:
-    image: mysql:latest
+    image: mysql:5.7
     restart: always
     environment:
       MYSQL_ROOT_PASSWORD: "root"
@@ -52,22 +52,20 @@ services:
     labels:
       - "traefik.enable=false"
 
-  # #Le serveur de phpmyadmin
-  # phpmyadmin:
-  #   image: phpmyadmin:latest
-  #   restart: always
-  #   depends_on:
-  #     - db
-  #   environment:
-  #     PMA_HOST: minimal-db
-  #     PMA_ARBITRARY: 0
-  #   container_name: ${PROJECT_NAME}-pma
-  #   networks:
-  #     - web
-  #   labels:
-  #     - "traefik.enable=true"
-  #     - "traefik.http.routers.pma-${PROJECT_NAME}.rule=Host(`pma.${PROJECT_NAME}.${TRAEFIK_DOMAIN}`)"
-  #     - "traefik.http.routers.pma-${PROJECT_NAME}.entrypoints=web"
+  #Le serveur de adminer
+  adminer:
+    image: adminer
+    restart: always
+    depends_on:
+      - db
+    container_name: ${PROJECT_NAME}-adminer
+    networks:
+      - web
+      - project_php
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.adminer-${PROJECT_NAME}.rule=Host(`adminer.${PROJECT_NAME}.${TRAEFIK_DOMAIN}`)"
+      - "traefik.http.routers.adminer-${PROJECT_NAME}.entrypoints=web"
 
 networks:
   project_php:
