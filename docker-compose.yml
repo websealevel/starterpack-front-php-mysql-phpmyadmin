@@ -9,64 +9,67 @@ services:
       - ./front/:/usr/local/apache2/htdocs/:rw
     container_name: ${PROJECT_NAME}-front
     networks:
+      - project_php
       - web
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.${PROJECT_NAME}-front.rule=Host(`${PROJECT_NAME}.front.${TRAEFIK_DOMAIN}`)"
-      - "traefik.http.routers.${PROJECT_NAME}-front.entrypoints=web"
+      - "traefik.http.routers.front-${PROJECT_NAME}.rule=Host(`front.${PROJECT_NAME}.${TRAEFIK_DOMAIN}`)"
+      - "traefik.http.routers.front-${PROJECT_NAME}.entrypoints=web"
 
   #Le serveur php
   back:
-    image: php:8.0-apache
+    build:
+      context: ./
+      dockerfile: Dockerfile-apache-php
     depends_on:
       - db
     restart: always
     networks:
+      - project_php
       - web
     volumes:
       - ./back/:/var/www/html/:rw
     container_name: ${PROJECT_NAME}-back
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.${PROJECT_NAME}-back.rule=Host(`${PROJECT_NAME}.back.${TRAEFIK_DOMAIN}`)"
-      - "traefik.http.routers.${PROJECT_NAME}-back.entrypoints=web"
+      - "traefik.http.routers.back-${PROJECT_NAME}.rule=Host(`back.${PROJECT_NAME}.${TRAEFIK_DOMAIN}`)"
+      - "traefik.http.routers.back-${PROJECT_NAME}.entrypoints=web"
     #Nous donne les droits en ecriture au volume (par défaut donné à root, pas cool)
     user: "${UID}:${GID}"
-
-  #Le serveur de phpmyadmin
-  phpmyadmin:
-    image: phpmyadmin:latest
-    restart: always
-    depends_on:
-      - db
-    environment:
-      PMA_HOST: minimal-db
-      PMA_ARBITRARY: 0
-    container_name: ${PROJECT_NAME}-pma
-    networks:
-      - web
-    labels:
-      - "traefik.enable=true"
-      - "traefik.http.routers.${PROJECT_NAME}-phpmyadmin.rule=Host(`phpmyadmin.${PROJECT_NAME}.${TRAEFIK_DOMAIN}`)"
-      - "traefik.http.routers.${PROJECT_NAME}-phpmyadmin.entrypoints=web"
 
   #Le serveur de la base de données mysql
   db:
     image: mysql:latest
     restart: always
     environment:
-      MYSQL_DATABASE: "mydatabase"
-      MYSQL_USER: "user"
-      MYSQL_PASSWORD: "password"
-      #Password pour l'user root (appelé root par défaut)
-      MYSQL_ROOT_PASSWORD: "password"
+      MYSQL_ROOT_PASSWORD: "root"
     container_name: ${PROJECT_NAME}-db
-      # Where our data will be persisted
     volumes:
       - ./mysql-data:/var/lib/mysql
+      - ./init:/docker-entrypoint-initdb.d
     networks:
-      - web
+      - project_php
+    labels:
+      - "traefik.enable=false"
+
+  # #Le serveur de phpmyadmin
+  # phpmyadmin:
+  #   image: phpmyadmin:latest
+  #   restart: always
+  #   depends_on:
+  #     - db
+  #   environment:
+  #     PMA_HOST: minimal-db
+  #     PMA_ARBITRARY: 0
+  #   container_name: ${PROJECT_NAME}-pma
+  #   networks:
+  #     - web
+  #   labels:
+  #     - "traefik.enable=true"
+  #     - "traefik.http.routers.pma-${PROJECT_NAME}.rule=Host(`pma.${PROJECT_NAME}.${TRAEFIK_DOMAIN}`)"
+  #     - "traefik.http.routers.pma-${PROJECT_NAME}.entrypoints=web"
 
 networks:
+  project_php:
   web:
     external: true
