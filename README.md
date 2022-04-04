@@ -1,4 +1,4 @@
-# Fabriquer, utiliser un starterpack dans un worflow docker multi-projets friendly
+# Fabriquer, utiliser un starterpack dans un worflow docker *multi-projets friendly*
   - [Introduction](#introduction)
   - [Pas le temps ou l'envie, je suis pressé de l'utiliser](#pas-le-temps-ou-lenvie-je-suis-pressé-de-lutiliser)
   - [Docker au lieu de LAMP, être machine indépendant](#docker-au-lieu-de-lamp-être-machine-indépendant)
