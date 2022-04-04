@@ -471,13 +471,13 @@ A présent on peut labeliser nos services Docker sous la clef `labels` de notre 
 
 Adapter le nom de domaine selon vos préférences. On fait la même chose pour les autres services. On relance le projet avec `docker-compose up -d` et si on visite `front.foo.test`, normalement, on est servis !
 
-Vous pouvez y tester, via un petit formulaire, la communication entre le front et le back. Le back teste la connexion à la base de données et retourne la réponse. Si tout se passe bien vous devriez obtenir la réponse `Hello World ! La connexion à la base de données a réussi !`. Si c'est le cas, bravo ! Si c'est pas le cas, courage. Moi aussi j'ai galéré à monter ce pack... Ou alors j'ai oublié de mentionner une configuration et n'hésitez pas à ouvrir une issue sur le dépôt !
+Vous pouvez y tester, via un petit formulaire, la communication entre le front et le back. Le back teste la connexion à la base de données et retourne la réponse. Si tout se passe bien vous devriez obtenir la réponse `La connexion à la base de données a réussi !`. Si c'est le cas, bravo ! Si c'est pas le cas, courage. Moi aussi j'ai galéré à monter ce pack... Ou alors j'ai oublié de mentionner une configuration et n'hésitez pas à faire une pull request sur le dépôt !
 
-Et voilà, c'est fini ! Enfin, tout peut commencer. A présent vous pouvez dupliquer ce starterpack autant que vous le souhaitez, d'ailleurs changer même les services et changer complètement de stack. Vous avez toutes les clefs pour monter votre stack préféré sur des conteneurs accessibles via un nom de domaine facile à retenir et ne rentrant pas en conflit avec tous vos autres projets.
+Et voilà, c'est fini ! Enfin, tout peut à présent *commencer*. 
 
-On remarquera qu'on ne précise plus de ports pour les conteneurs. En effet, c'est bien le conteneur Traefik qui est mappé au port 80 et qui écoute. Les autres conteneurs se sont vus attribués des ports aléatoires et nous n'avons plus à nous en soucier !
+Vous pouvez dupliquer ce starterpack autant que vous le souhaitez, d'ailleurs changer même les services et changer complètement de stack. Vous avez toutes les clefs pour monter votre stack préféré sur des conteneurs accessibles via un nom de domaine facile à retenir et ne rentrant pas en conflit avec tous vos autres projets.
 
-Merci pour votre lecture.
+**On remarquera qu'on ne précise plus de ports pour les conteneurs**. En effet, c'est bien le conteneur Traefik qui est mappé au port `80` et qui écoute. Les autres conteneurs se sont vus attribués des ports aléatoires et *nous n'avons plus à nous en soucier* !
 
 ## Mode pragmatique : utiliser le projet directement
 
