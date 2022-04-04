@@ -3,7 +3,7 @@
 - [Fabriquer et utiliser son starterpack](#fabriquer-et-utiliser-son-starterpack)
   - [Pas le temps ou l'envie, je suis pressé de l'utiliser](#pas-le-temps-ou-lenvie-je-suis-pressé-de-lutiliser)
   - [Docker au lieu de LAMP, être machine indépendant](#docker-au-lieu-de-lamp-être-machine-indépendant)
-  - [Docker-compose](#docker-compose)
+  - [Docker-compose s'impose](#docker-compose-simpose)
   - [Nos services Docker ou _conteneurs_](#nos-services-docker-ou-conteneurs)
     - [Services : de quoi a-t-on besoin ?](#services--de-quoi-a-t-on-besoin-)
       - [Un backend](#un-backend)
@@ -50,7 +50,7 @@ Si vous voulez directement utiliser ce starterpack sans vous soucier des détail
 
 LAMP c'est bien mais c'est machine-dépendant, c'est galère. On doit installer et configurer des choses directement sur notre machine locale. J'aime pas trop bidouiller ma machine locale pour faire marcher un projet. Qui dit que je ne devrais pas la rebidouiller pour un autre et que ces changements ne casseront pas la config du projet précédent ? Pour ces raisons, on va utiliser [Docker](https://docs.docker.com/). Rien ne sera installé sur notre machine (seulement une petite config qui passera inaperçue): on reste clean et en plus notre projet _est garanti_ (normalement) de marcher sur toute machine capable de faire tourner Docker.
 
-## Docker-compose
+## Docker-compose s'impose
 
 Comme on aura plusieurs conteneurs à gérer on va se servir de [docker-compose ou Compose](https://docs.docker.com/compose/), ce qui va nous faciliter la tâche. On va définir tous nos conteneurs dans un seul fichier de configuration. Une fois qu'on aura cablé tout ça ce sera opérationnel, et on aura notre starterpack.
 
