@@ -1,6 +1,7 @@
 # Fabriquer et utiliser son starterpack
 
 - [Fabriquer et utiliser son starterpack](#fabriquer-et-utiliser-son-starterpack)
+  - [Introduction](#introduction)
   - [Pas le temps ou l'envie, je suis pressé de l'utiliser](#pas-le-temps-ou-lenvie-je-suis-pressé-de-lutiliser)
   - [Docker au lieu de LAMP, être machine indépendant](#docker-au-lieu-de-lamp-être-machine-indépendant)
   - [Docker-compose s'impose](#docker-compose-simpose)
@@ -39,6 +40,8 @@
   - [Références](#références)
     - [Images officielles et leur documentation](#images-officielles-et-leur-documentation)
     - [Autres](#autres)
+
+## Introduction
 
 Un starterpack c'est un projet à l'état initial où les câbles sont tirés. C'est pratique car on peut le dupliquer pour commencer rapidement un nouveau projet. On galère **une fois** à mettre l'environnement en place et puis après on est tranquille. On peut le faire évoluer ensuite. Pour cela je recommande de faire un dépot qui contient ce starterpack. A chaque fois qu'on relance un projet on le duplique et on fait un dépôt pour ce projet. Voilà un petit workflow sympathique. On documente bien aussi son starterpack, comme ça si on revient dans 1 mois on peut se souvenir de ce qu'on a fait et pourquoi on a fait les choses comme ça. Soyons sympas envers nous même, et les autres.
 
