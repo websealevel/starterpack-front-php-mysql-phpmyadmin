@@ -83,7 +83,9 @@ Rien de plus à dire pour le moment, passons à la base de données.
 
 #### Une base de données PostgreSQL
 
-Le service `db` est monté à partir d'une image [PostgreSQL](https://hub.docker.com/_/postgres/). On préfère [PostgreSQL](https://www.postgresql.org/) à MySQL ou MariaDB car PostgreSQL est l'implémentation open-source la plus avancée du standard SQL. On renseigne ici les valeurs des variables d'environnement [mises à disposition par l'image officielle](https://hub.docker.com/_/postgres). On doit également dire au conteneur où stocker sur notre machine hôte le système de fichiers du SGBD. On le fait avec la ligne
+Le service `db` est monté à partir d'une image [PostgreSQL](https://hub.docker.com/_/postgres/). On préfère [PostgreSQL](https://www.postgresql.org/about/) à MySQL ou MariaDB car PostgreSQL est l'implémentation open-source la plus avancée du standard SQL. 
+
+On renseigne ici les valeurs des variables d'environnement [mises à disposition par l'image officielle](https://hub.docker.com/_/postgres). On doit également dire au conteneur où stocker sur notre machine hôte le système de fichiers du SGBD. On le fait avec la ligne
 
 
 ~~~yaml
