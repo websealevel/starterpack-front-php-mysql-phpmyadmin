@@ -12,7 +12,7 @@ $dbpasswd = "password";
 
 
 //CORS policy
-header("Access-Control-Allow-Origin: http://front.demo.test");
+header("Access-Control-Allow-Origin: http://front.PROJECT_NAME.test");
 header("Content-Type: application/json");
 
 //Ping la base de données
