@@ -48,7 +48,7 @@ services:
     restart: always
     container_name: ${PROJECT_NAME}-db
     volumes:
-      - ./mysql-data:/var/lib/mysql
+      - ./mariadb-data:/var/lib/mysql
       - ./init:/docker-entrypoint-initdb.d
     networks:
       - project_php

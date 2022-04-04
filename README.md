@@ -7,8 +7,8 @@
   - [Nos services Docker ou _conteneurs_](#nos-services-docker-ou-conteneurs)
     - [Services : de quoi a-t-on besoin ?](#services--de-quoi-a-t-on-besoin-)
       - [Un backend](#un-backend)
-      - [Une base de données MySQL](#une-base-de-données-mysql)
-      - [Adminer](#adminer)
+      - [Une base de données MariaDB](#une-base-de-données-mariadb)
+      - [Adminer, un client de base de données léger et sécurisé](#adminer-un-client-de-base-de-données-léger-et-sécurisé)
       - [Un serveur front](#un-serveur-front)
     - [Communication _entre_ nos services](#communication-entre-nos-services)
     - [Communication _avec_ nos services](#communication-avec-nos-services)
@@ -16,7 +16,7 @@
     - [Lançons le projet](#lançons-le-projet)
     - [Testons le projet](#testons-le-projet)
     - [Arrêtons le projet](#arrêtons-le-projet)
-  - [Aller un peu plus loin, acceder à nos conteneurs via un nom de domaine](#aller-un-peu-plus-loin-acceder-à-nos-conteneurs-via-un-nom-de-domaine)
+  - [Valeur ajoutée : acceder à nos conteneurs via des vrais noms de domaine](#valeur-ajoutée--acceder-à-nos-conteneurs-via-des-vrais-noms-de-domaine)
     - [Issues](#issues)
     - [Apparté: automatiser vos tâches répétitives et fastidieuses](#apparté-automatiser-vos-tâches-répétitives-et-fastidieuses)
     - [Résoudre tous ces problèmes: dns local et reverse-proxy](#résoudre-tous-ces-problèmes-dns-local-et-reverse-proxy)
@@ -24,7 +24,7 @@
       - [Nouveau dépôt](#nouveau-dépôt)
       - [Configuration de Traefik](#configuration-de-traefik)
         - [Lancement du conteneur Traefik](#lancement-du-conteneur-traefik)
-        - [Intercepter uniquement les reqûetes vers nos conteneurs Docker](#intercepter-uniquement-les-reqûetes-vers-nos-conteneurs-docker)
+        - [Intercepter seulement les requêtes qui nous intéressent](#intercepter-seulement-les-requêtes-qui-nous-intéressent)
         - [Application à notre starterpack](#application-à-notre-starterpack)
         - [Ajout du nom de domaine dans le `.env`](#ajout-du-nom-de-domaine-dans-le-env)
       - [En résumé](#en-résumé)
@@ -40,7 +40,7 @@
     - [Images officielles et leur documentation](#images-officielles-et-leur-documentation)
     - [Autres](#autres)
 
-Un starterpack c'est un projet à l'état initial où les cables sont tirés. C'est pratique car on peut le dupliquer pour commencer rapidement un nouveau projet. On galère une fois à mettre l'environnement en place et puis après on est tranquille. On peut le faire évoluer ensuite. Pour cela je recommande de faire un dépot qui contient ce starterpack. A chaque fois qu'on relance un projet on le duplique et on fait un dépôt pour ce projet. Et voilà un petit workflow sympathique. On documente bien aussi le starterpack, comme ça si on revient dans 1 mois on peut se souvenir de ce qu'on a fait et pourquoi on a fait les choses comme ça. Soyons sympas envers nous même, et les autres.
+Un starterpack c'est un projet à l'état initial où les cables sont tirés. C'est pratique car on peut le dupliquer pour commencer rapidement un nouveau projet. On galère **une fois** à mettre l'environnement en place et puis après on est tranquille. On peut le faire évoluer ensuite. Pour cela je recommande de faire un dépot qui contient ce starterpack. A chaque fois qu'on relance un projet on le duplique et on fait un dépôt pour ce projet. Voilà un petit workflow sympathique. On documente bien aussi son starterpack, comme ça si on revient dans 1 mois on peut se souvenir de ce qu'on a fait et pourquoi on a fait les choses comme ça. Soyons sympas envers nous même, et les autres.
 
 ## Pas le temps ou l'envie, je suis pressé de l'utiliser
 
@@ -81,20 +81,18 @@ Enfin, notre backend va communiquer avec notre service hebergeant notre base de 
 
 Rien de plus à dire pour le moment, passons à la base de données.
 
-#### Une base de données MySQL
+#### Une base de données MariaDB
 
-Le service `db` est un conteneur MySQL. On renseigne ici les valeurs des variables d'environnement [mises à disposition par l'image officielle](https://hub.docker.com/_/mysql). On doit également dire au conteneur où stocker sur notre machine hôte le système de fichiers du SGBD. On le fait avec la ligne
+Le service `db` est un conteneur MariaDB. On renseigne ici les valeurs des variables d'environnement [mises à disposition par l'image officielle](https://hub.docker.com/_/mariadb). On doit également dire au conteneur où stocker sur notre machine hôte le système de fichiers du SGBD. On le fait avec la ligne
 
 
 ~~~yaml
-    volumes: - ./mysql-data:/var/lib/mysql
+    volumes: - ./mariadb-data:/var/lib/mysql
 ~~~
 
-#### Adminer
+#### [Adminer](https://www.adminer.org/), un client de base de données léger et sécurisé
 
-Un monte un service `adminer` pour se faciliter la vie lorsque l'on voudra travailler sur la base de données. Pas envie de faire ça via la CLI, du moins pas pour le moment. Rien de spécial ici.
-
-Ce service dépend du service `db` donc on l'explicite également.
+Un monte un service `adminer` pour se faciliter la vie lorsque l'on voudra travailler sur la base de données. Pas envie de faire ça via la CLI, du moins pas pour le moment. Ce service dépend du service `db` donc on l'explicite également. Rien de spécial ici.
 
 #### Un serveur front
 
@@ -131,9 +129,9 @@ networks:
     external: true
 ~~~
 
-On indique que le réseau `web` est `external` ce qui veut dire qu'il existe déjà. On ne veut pas en recréer un autre. On ajoute égalempent un réseau propre au projet `project_php`. Docker va aitomatiquement créer un réseau de la forme `${COMPOSE_PROJECT_NAME}_project_php`, où `${COMPOSE_PROJECT_NAME}` est le nom du dossier dans lequel se trouve votre projet par défaut. On a donc un réseau unique pour chaque projet.
+On indique que le réseau `web` est `external` ce qui veut dire qu'il existe déjà. On ne veut pas en recréer un autre. On ajoute égalempent un réseau propre au projet `project_php`. Docker va automatiquement créer un réseau de la forme `${COMPOSE_PROJECT_NAME}_project_php`, où `${COMPOSE_PROJECT_NAME}` est le nom du dossier dans lequel se trouve votre projet par défaut. On a donc un réseau unique pour chaque projet.
 
-On veut à présent exposer tous les conteneurs sur le réseau `web` que l'on peut se représenter comme le réseau public, accessible au monde exterieur, sauf la base de données. Aucun raison qu'on puisse y accèder depuis le monde exterieur. Non recommandé. C'est le service `back` qui va communiquer avec la base de données. Donc on met tout le monde sous `web` et `project_php`, sauf `db` que l'on met que sous `project_php`. Cela donne
+On veut à présent exposer tous les conteneurs sur le réseau `web` que l'on peut se représenter comme le réseau public, accessible au monde exterieur, **sauf la base de données**. Aucun raison qu'on puisse y accèder depuis le monde exterieur. Non recommandé. C'est le service `back` qui va communiquer avec la base de données. Donc on met tout le monde sous `web` et `project_php`, sauf `db` que l'on met que sous `project_php`. Cela donne
 
 
 ~~~yaml
@@ -152,7 +150,7 @@ services:
       - project_php
       - web
 
-  #Le serveur de la base de données mysql
+  #Le serveur de la base de données mariadb
   db:
     ...
     networks:
@@ -180,16 +178,18 @@ Comme on l'a vu précédemment, tous les conteneurs appartenant au même réseau
 
 ### Communication _avec_ nos services
 
-Pour communiquer, nous, depuis notre machine, avec nos conteneurs Docker il faut leur prêter un port de notre machine hôte (l'ordinateur sur lequel vous travaillez). C'est ce que l'on fait avec la directive
+Pour communiquer, nous, depuis notre machine, avec nos conteneurs Docker il faut leur prêter (ou *maper*) un port de notre machine hôte (l'ordinateur sur lequel vous travaillez). C'est ce que l'on fait avec la directive
 
+~~~yaml
     ports:
       - "9000:80"
+~~~
 
 Un port c'est une entité logique (et non matérielle) qui agit comme un identifiant pour chaque processus sur notre machine. Cet identifiant permet également de communiquer avec ce processus depuis un autre processus. Les ports vont de `0` à `65535` et si je comprends bien ceux entre 1024 et 49151 sont disponibles et non utilisés par des processus importants.
 
 Ici, on associe le port `9000` de notre machine au port `80` de notre conteneur, le port par défaut pour le protocole HTTP. Pourquoi ai-je choisi le port `9000` ? Aucune idée, il fait juste partie des ports disponibles.
 
-Les services `back`, `adminer` et `front` sont tous des serveurs HTTP qui communiquent via le port `80`, donc pour chacun d'entre eux je map un port de ma machine hôte à leur port 80. Et pour le service `db` ? Par défaut, MySQL utilise le port `3306`.
+Les services `back`, `adminer` et `front` sont tous des serveurs HTTP qui communiquent via le port `80`, donc pour chacun d'entre eux je map un port de ma machine hôte (prenez en un parmi les ports disponibles) à leur port `80`. Et pour le service `db` ? Par défaut, MariaDB utilise le port `3306`.
 
 ## Le starterpack en action
 
@@ -197,9 +197,8 @@ Les services `back`, `adminer` et `front` sont tous des serveurs HTTP qui commun
 
 Maintenant que tout est bien configuré, lançons le projet avec un
 
-
 ~~~bash
-    docker-compose up -d
+docker-compose up -d
 ~~~
 ### Testons le projet
 
@@ -208,7 +207,7 @@ Si c'est la première fois que vous lancez la commande Docker va construire les 
 Tapez la commande
 
 ~~~bash
-    docker ps -a
+docker ps -a
 ~~~
 
 Elle vous listera tous les conteneurs en activité à la racine du projet, avec différentes informations.
@@ -219,19 +218,23 @@ Ouvrez 3 onglets dans votre navigateur favori et demandez `localhost:9000` (fron
 
 Pour stoper tous les conteneurs du projet faites un
 
-    docker-compose down
+~~~bash
+docker-compose down
+~~~
 
 Enfin si les choses vous ont échappées, pas de panique, vous pouvez arrêter **tous** les conteneurs avec la commande
 
-    docker rm -f $(docker ps -a -q)
+~~~bash
+docker rm -f $(docker ps -a -q)
+~~~
 
-Félicitations ! Notre starterpack commence à ressembler à quelque-chose. On va pouvoir s'en servir de base pour nos projets.
+Félicitations ! Notre starterpack commence à ressembler à quelque-chose. On va pouvoir s'en servir comme d'une base pour nos projets. Ou l'adaptez à nos besoins, changeant nos services en fonction des langages/frameworks/architectures que l'on veut utiliser.
 
-## Aller un peu plus loin, acceder à nos conteneurs via un nom de domaine
+## Valeur ajoutée : acceder à nos conteneurs via des vrais noms de domaine
 
 ### Issues
 
-So far, so good. Vous pouvez vous arrêtez là si vous le souhaitez (je le recommande pas car la suite vaut le détour) mais on peut aller un peu plus loin pour améliorer notre starterpack.
+So far, so good. Vous pouvez vous arrêtez là si vous le souhaitez (je le recommande pas car la suite *vaut le détour*) mais on peut aller un peu plus loin pour améliorer notre starterpack.
 
 Vous avez remarqué qu'accéder à nos conteneurs via un obscure nom de domaine comme `localhost:9000` c'est pas fou ? Déjà on ne sait plus ce qui se cache derrière comme service. Et pire, si demain on monte un autre projet avec notre starterpack il faudra
 
@@ -248,7 +251,7 @@ Si c'est une tâche que vous faites deux fois par an peut-être que ça vaut pas
 
 Un conseil que je peux donner c'est que si vous vous retrouvez à faire des choses manuellement souvent et que ça necessite de taper un peu trop de texte, de manipuler des fichiers, de cliquer plusieurs fois à différents endroits de votre écran, notez cette tâche quelque part. Sur un cahier, un fichier texte peu importe. Faites vous une liste. Et de temps en temps, essayez d'automatiser certaines de ces tâches, ou apprenez les raccourcis pour les rendre moins fastidieuses. On a pas toujours le temps de se pencher là-dessus. C'est pourquoi de les noter et de le faire quand on a un moment je pense que c'est une bonne idée.
 
-Le DRY, comme on dit, ce n'est pas que dans le code.
+Le *DRY*, comme on dit, ce n'est pas que dans le code.
 
 ### Résoudre tous ces problèmes: dns local et reverse-proxy
 
@@ -263,7 +266,7 @@ Pour y parvenir, on va se servir d'un serveur dns local et d'un reverse-proxy. O
 - utiliser le domaine reservé `.test` pour capter tous les sous-domaines (aka tous nos projets de dev) et renvoyer les reqûetes vers notre machine. C'est le job de notre service dns local
 - intercepter les requêtes entrant sur notre machine pour les résoudre et les rediriger vers le bon conteneur Docker, par exemple le adminer d'un de nos projets. C'est le job du [reverse-proxy](https://fr.wikipedia.org/wiki/Proxy_inverse), il agit comme un portique par lequel les requêtes entrantes vont devoir passer pour être traitées selon nos besoins.
 
-Pour mettre en place ce système on va avoir besoin de conteneurs Docker car on va conteneurisé le reverse proxy (et oui, encore, le minimum sur notre machine). Pour cela, on va créer un nouveau dépôt en dehors de notre starterpack. Un projet, un dépôt, c'est la règle. Ce projet vivra sa vie de manière indépendante sur votre machine et pourra servir à tous vos projets en local et non seulement à ceux réalisés avec votre starterpack. Quand on l'aura cablé, on le lancera une fois pour toute et vous n'y retoucherez plus jamais.
+Pour mettre en place ce système on va avoir besoin de conteneurs Docker car on va conteneurisé le reverse proxy (et oui, encore, le minimum sur notre machine). Pour cela, on va créer un nouveau dépôt en dehors de notre starterpack. **Un projet, un dépôt**, c'est la règle. Ce projet vivra sa vie de manière *indépendante* sur votre machine et pourra servir à tous vos projets en local et non seulement à ceux réalisés avec votre starterpack. Quand on l'aura cablé, on le lancera une fois pour toute et vous n'y retoucherez plus jamais (dans un monde idéal).
 
 Créer donc un autre dépôt sur votre machine, par exemple `local-env-docker` et allons-y.
 
@@ -273,7 +276,7 @@ Mettons en place ce système. Je le fais sur Linux, si vous êtes sur un autre O
 
 Dans tous les cas, pour notre dns local on va utiliser [dnsmasq](https://www.linuxtricks.fr/wiki/dnsmasq-le-serveur-dns-et-dhcp-facile-sous-linux) (disponible sous Linux/MacOS, pour Windows un équivalent semble être [Acrylic](http://mayakron.altervista.org/support/acrylic/Home.htm)).
 
-Sur Linux, en tout cas sur Ubuntu, la configuration réseau est gérée par le processus `systemd`. Celui-ci définit `NetworkManager` comme application réseau par défaut. `NetworkManager` gère donc les DNS et le DHCP de votre machine. NetworkManager connait mais n'utilise pas `dnsmasq` par défaut donc il va falloir lui dire. On édite le fichier de configuration `/etc/NetworkManager/NetworkManager.conf` et on ajoute une nouvelle ligne `dns=dnsmasq` dans la section `[main]`. On enregistre la modification.
+Sur Linux, en tout cas sur Ubuntu ou Debian, la configuration réseau est gérée par le processus `systemd`. Celui-ci définit `NetworkManager` comme application réseau par défaut. `NetworkManager` gère donc les DNS et le DHCP de votre machine. NetworkManager connait mais n'utilise pas `dnsmasq` par défaut donc il va falloir lui dire. On édite le fichier de configuration `/etc/NetworkManager/NetworkManager.conf` et on ajoute une nouvelle ligne `dns=dnsmasq` dans la section `[main]`. On enregistre la modification.
 
 En principe, la résolution d'URL est gérée par `systemd-resolver`, mais, on va laisser `NetworkManager` s'en occuper afin de permettre à `dnsmasq` d'attraper les URLs qui nous concernent, celles en `.test`, en exécutant la commande suivante :
 
@@ -303,7 +306,7 @@ Donc dorénavant toutes vos requêtes depuis votre navigateur vers un sous domai
 
 #### Nouveau dépôt
 
-Notre seule config sur notre machine locale est terminée. A présent nous allons pouvoir mettre en place notre reverse proxy.
+Notre **seule config sur notre machine locale est terminée**. A présent nous allons pouvoir mettre en place notre reverse proxy.
 
 Dans notre dépôt dédié `local-env-docker` (et complètement indépendant de notre starterpack et de son dépôt) on va crée un fichier `docker-compose.yml` et un `.env` pour _dockeriser_ `Traefik`.
 
@@ -328,7 +331,7 @@ Regardons aussi [cette page](https://doc.traefik.io/traefik/getting-started/conf
 Déjà on ne veut pas que Traefik intercepte toutes les requêtes entrantes, seulement les requêtes HTTP (nos requêtes en `.test`). Pour cela on va utiliser la directive
 `entryPoints` directement dans notre docker-compose.yml, c'est de la [configuration dynamique](https://doc.traefik.io/traefik/getting-started/configuration-overview/#the-dynamic-configuration) car elle va s'adapter à chaque situation. Voici notre service reverse-proxy, en s'inspirant directement de l'[exemple donné dans la doc](https://doc.traefik.io/traefik/user-guides/docker-compose/basic-example/)
 
-```
+```yaml
 services:
   reverse-proxy:
     # The official v2 Traefik docker image
@@ -350,7 +353,7 @@ services:
       - "--entrypoints.web.address=:80"
 ```
 
-On map les ports 80 pour que Traefik écoute toutes les requêtes http entrantes sur notre machine. Le port 8080 est utilisé pour nous donner accès à des UI de Traefik (comme `http://localhost:8080/api/rawdata` que nous avons inspecté juste avant). La partie qui nous intéresse pour la configuration dynamique est sous la clef `command`. Ici on dit
+On map les ports `80` pour que Traefik écoute toutes les requêtes http entrantes sur notre machine. Le port 8080 est utilisé pour nous donner accès à des UI de Traefik (comme `http://localhost:8080/api/rawdata` que nous avons inspecté juste avant). La partie qui nous intéresse pour la configuration dynamique est sous la clef `command`. Ici on dit
 
 - `--api.insecure=true`, on active l'API de Traefik pour exposer tout un tas d'UI et d'informations. Très utile pour le dev, à désactiver en prod (c'est le cas par défaut)
 - `--providers.docker=true`, pas sûr de comprendre exactement mais en gros on dit à Traefik que Docker est utilisé. Donc Traefik va pouvoir requêter l'API de Docker pour pouvoir fonctionner correctement avec Docker
@@ -359,13 +362,13 @@ On map les ports 80 pour que Traefik écoute toutes les requêtes http entrantes
 
 Les `entryPoints` permettent à Traefik de récupérer les requêtes. Maintenant il faut lui dire vers où les diriger. Traefik crée pour chaque conteneur detecté un [routeur](https://doc.traefik.io/traefik/routing/routers/) et un [service](https://doc.traefik.io/traefik/routing/services/). Un _router_ est en charge de rediriger les requêtes entrantes vers le service Traefik qui peut les gérer. C'est un câble tiré entre l'`entryPoint` et le `service Traefik`. Oui il y a un peu de terminologie mais la documentation est vraiment bien faite et accompagnée de schémas en couleur. Un _service Traefik_, à ne pas confondre avec notre service Compose, est quand à lui responsable de définir _comment_ accéder rééelement à nos conteneurs. On verra ça juste après. Pour l'instant on met en place la partie interface entre Traefik et notre machine.
 
-##### Intercepter uniquement les reqûetes vers nos conteneurs Docker
+##### Intercepter seulement les requêtes qui nous intéressent
 
 Donc là, on a dit de récuperer les requêtes HTTP mais on veut être encore plus restrictif et ne pas interférer avec le trafic sur notre machine, on veut récupérer seulement les requêtes en `.test`.
 
 Ajoutons les configurations suivantes
 
-```
+```yaml
       - "--providers.docker.network=web"
       - "--providers.docker.defaultrule=HostRegexp(`{subdomain:[a-z]+}.test`)"
 ```
@@ -376,7 +379,7 @@ Relancez le projet avec `docker-compose up -d`. Si vous retournez sur `http://lo
 
 Comment ré-intégrer notre service whoami à Traefik ? Pour cela on va ajouter un peu de config sur notre service `whoami` sous la clef `labels`. Labeliser nos conteneurs permet à Traefik de retrouver sa configuration de routing, et donc au final le conteneur ciblé en retrouvant son adresse ip.
 
-```
+```yaml
 whoami:
   labels:
     # Explicitly tell Traefik to expose this container
@@ -414,7 +417,7 @@ TRAEFIK_DOMAIN=test
 
 Puis dans le docker-compose.yml on va modifier légèrement notre règle précédente pour filtrer les requêtes entrantes
 
-```
+```yaml
       - "--providers.docker.defaultrule=HostRegexp(`{subdomain:[a-z0-9]+}.${TRAEFIK_DOMAIN`)"
 ```
 
@@ -447,7 +450,7 @@ PROJECT_NAME=foo
 
 A présent on peut labeliser nos services Docker sous la clef `labels` de notre starterpack (à savoir `back`, `front`, `adminer`) comme on l'a fait avec le service `whoami`. Par exemple pour le service front
 
-```
+```yaml
   #Le serveur front (html static)
   front:
     image: httpd:latest
@@ -486,7 +489,7 @@ Il est composé de deux projets (chacun sur son dépôt):
   - `front` : un serveur qui sert du contenu HTML statique
   - `back` : un serveur apache/php pour le backend
   - `adminer`: pour administrer la base de données
-  - `db` : une base de données MySql
+  - `db` : une base de données Mariadb
 - le [reverse-proxy](https://github.com/websealevel/local-env-docker), pour faciliter notre workflow et la gestion de nos projets
 
 ### Prérequis
@@ -502,11 +505,9 @@ Pas de questions, pas d'explications. On va droit au but.
 1. Cloner le dépôt [local-docker-env](https://github.com/websealevel/local-env-docker)
 2. Configurer le dns local en suivant les instructions de cette [section](#mise-en-place-dun-dns-local-avec-dnsmasq). A faire qu'une fois pour tous vos projets
 3. Lancer le projet à la racine avec `docker-compose up -d`. A faire qu'une fois pour tous vos projets. Laissez tourner le conteneur `traefik` pour tous vos projets
-4. Cloner ce dépot [starter-pack-front-php-mysql](https://github.com/websealevel/starterpack-front-php-mysql-phpmyadmin)
-   1. Changer la valeur de `PROJECT_NAME` et donner lui le nom de votre projet (lettres minuscules de préférence)
-   2. Créer un dossier `mysql-data`
-   3. Lancer le projet à la racine avec `docker-compose up -d`
-   4. Accéder à vos services :
+4. Cloner le dépot [starter-pack-front-php-mysql](https://github.com/websealevel/starterpack-front-php-mysql-phpmyadmin)
+   1. Configurer un projet en lançant init-project.sh {nom-de-votre-projet}. Le script va configurer le projet et remplacer la valeur du nom du projet partout où il faut. Il va créer également les images Docker et lancer les conteneurs.
+   2. Accéder à vos services :
       1. `front.${PROJECT_NAME}.test` pour acceder au backend
       2. `back.${PROJECT_NAME}.test` pour acceder au frontend
       3. `adminer.${PROJECT_NAME}.test` pour acceder à adminer et à la base de données. Logger vous avec l'utilisateur `root` (mot de passe `root`)
@@ -534,7 +535,9 @@ Ne pas hésiter à consulter la documentation de Docker, Compose et Traefik. Ell
 ### Images officielles et leur documentation
 
 - [Mariadb](https://hub.docker.com/_/mariadb)
-- 
+- [Apache HTTP Server](https://hub.docker.com/_/httpd)
+- [Adminer](https://hub.docker.com/_/adminer)
+- [Apache PHP](https://hub.docker.com/_/php/)
 
 ### Autres
 
