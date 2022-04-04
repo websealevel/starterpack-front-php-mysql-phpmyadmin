@@ -27,7 +27,7 @@
         - [Intercepter seulement les requêtes qui nous intéressent](#intercepter-seulement-les-requêtes-qui-nous-intéressent)
         - [Application à notre starterpack](#application-à-notre-starterpack)
         - [Ajout du nom de domaine dans le `.env`](#ajout-du-nom-de-domaine-dans-le-env)
-      - [En résumé](#en-résumé)
+        - [En résumé](#en-résumé)
         - [Labeliser vos conteneurs Docker](#labeliser-vos-conteneurs-docker)
   - [Mode pragmatique : utiliser le projet directement](#mode-pragmatique--utiliser-le-projet-directement)
     - [Description courte](#description-courte)
@@ -432,7 +432,7 @@ Puis dans le docker-compose.yml on va modifier légèrement notre règle précé
 
 Voilà, c'est pas grand chose mais on y voit plus clair. Il sera plus facile de changer le domaine .test si on le souhaite, pour [un autre nom de domaine de premier niveau reservé(https://fr.wikipedia.org/wiki/Domaine_de_premier_niveau#Domaine_de_premier_niveau_r%C3%A9serv%C3%A9)] comme `.example`.
 
-#### En résumé
+##### En résumé
 
 Donc pour résumer quand je taperai `whoami.test` dans mon navigateur:
 
