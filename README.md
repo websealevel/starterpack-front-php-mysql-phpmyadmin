@@ -503,8 +503,8 @@ Il est composé de deux projets (chacun sur son dépôt):
 
 ### Prérequis
 
-- Docker
-- Docker-compose
+- docker
+- docker-compose
 - dnsmasq ou autre utilitaire de dns local
 
 Pas de questions, pas d'explications. On va droit au but.
