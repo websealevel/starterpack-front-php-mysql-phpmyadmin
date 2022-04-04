@@ -1,6 +1,4 @@
 # Fabriquer et utiliser son starterpack
-
-- [Fabriquer et utiliser son starterpack](#fabriquer-et-utiliser-son-starterpack)
   - [Introduction](#introduction)
   - [Pas le temps ou l'envie, je suis pressé de l'utiliser](#pas-le-temps-ou-lenvie-je-suis-pressé-de-lutiliser)
   - [Docker au lieu de LAMP, être machine indépendant](#docker-au-lieu-de-lamp-être-machine-indépendant)
