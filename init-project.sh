@@ -1,9 +1,7 @@
 #!/bin/bash
 
 # SCRIPT D'INITITIALISATION DU PROJET
-
-# Permet d'initialiser le nom du projet
-# Cree la base de données et lance le projet
+# Permet d'initialiser et de monter le projet
 
 if [ $# -eq 0 ]; then
   echo "Donnez un nom au projet"
