@@ -7,7 +7,7 @@
   - [Nos services Docker ou _conteneurs_](#nos-services-docker-ou-conteneurs)
     - [Services : de quoi a-t-on besoin ?](#services--de-quoi-a-t-on-besoin-)
       - [Un backend](#un-backend)
-      - [Une base de données MariaDB](#une-base-de-données-mariadb)
+      - [Une base de données PostgreSQL](#une-base-de-données-postgresql)
       - [Adminer, un client de base de données léger et sécurisé](#adminer-un-client-de-base-de-données-léger-et-sécurisé)
       - [Un serveur front](#un-serveur-front)
     - [Communication _entre_ nos services](#communication-entre-nos-services)
@@ -81,13 +81,13 @@ Enfin, notre backend va communiquer avec notre service hebergeant notre base de 
 
 Rien de plus à dire pour le moment, passons à la base de données.
 
-#### Une base de données MariaDB
+#### Une base de données PostgreSQL
 
-Le service `db` est un conteneur MariaDB. On renseigne ici les valeurs des variables d'environnement [mises à disposition par l'image officielle](https://hub.docker.com/_/mariadb). On doit également dire au conteneur où stocker sur notre machine hôte le système de fichiers du SGBD. On le fait avec la ligne
+Le service `db` est monté à partir d'une image [PostgreSQL](https://hub.docker.com/_/postgres/). On préfère [PostgreSQL](https://www.postgresql.org/) à MySQL ou MariaDB car PostgreSQL est l'implémentation open-source la plus avancée du standard SQL. On renseigne ici les valeurs des variables d'environnement [mises à disposition par l'image officielle](https://hub.docker.com/_/postgres). On doit également dire au conteneur où stocker sur notre machine hôte le système de fichiers du SGBD. On le fait avec la ligne
 
 
 ~~~yaml
-    volumes: - ./mariadb-data:/var/lib/mysql
+    volumes: - ./postgres-data:/var/lib/postgresql/data/
 ~~~
 
 #### [Adminer](https://www.adminer.org/), un client de base de données léger et sécurisé
@@ -150,7 +150,7 @@ services:
       - project_php
       - web
 
-  #Le serveur de la base de données mariadb
+  #Le serveur de la base de données postgres
   db:
     ...
     networks:
@@ -189,7 +189,7 @@ Un port c'est une entité logique (et non matérielle) qui agit comme un identif
 
 Ici, on associe le port `9000` de notre machine au port `80` de notre conteneur, le port par défaut pour le protocole HTTP. Pourquoi ai-je choisi le port `9000` ? Aucune idée, il fait juste partie des ports disponibles.
 
-Les services `back`, `adminer` et `front` sont tous des serveurs HTTP qui communiquent via le port `80`, donc pour chacun d'entre eux je map un port de ma machine hôte (prenez en un parmi les ports disponibles) à leur port `80`. Et pour le service `db` ? Par défaut, MariaDB utilise le port `3306`.
+Les services `back`, `adminer` et `front` sont tous des serveurs HTTP qui communiquent via le port `80`, donc pour chacun d'entre eux je map un port de ma machine hôte (prenez en un parmi les ports disponibles) à leur port `80`. Et pour le service `db` ? Par défaut, PostgreSQL utilise le port `5432`.
 
 ## Le starterpack en action
 
@@ -212,7 +212,7 @@ docker ps -a
 
 Elle vous listera tous les conteneurs en activité à la racine du projet, avec différentes informations.
 
-Ouvrez 3 onglets dans votre navigateur favori et demandez `localhost:9000` (front), `localhost:9001` (back), `localhost:90002`(adminer). Vous devriez visitez le front, le back et arriver sur adminer. Logez vous avec l'utilisateur `root` (mot de passe `root`).
+Ouvrez 3 onglets dans votre navigateur favori et demandez `localhost:9000` (front), `localhost:9001` (back), `localhost:90002`(adminer). Vous devriez visitez le front, le back et arriver sur adminer. Logez vous avec l'utilisateur `user` (mot de passe `password`).
 
 ### Arrêtons le projet
 
@@ -489,7 +489,7 @@ Il est composé de deux projets (chacun sur son dépôt):
   - `front` : un serveur qui sert du contenu HTML statique
   - `back` : un serveur apache/php pour le backend
   - `adminer`: pour administrer la base de données
-  - `db` : une base de données Mariadb
+  - `db` : une base de données PostegreSQL
 - le [reverse-proxy](https://github.com/websealevel/local-env-docker), pour faciliter notre workflow et la gestion de nos projets
 
 ### Prérequis
@@ -534,7 +534,7 @@ Ne pas hésiter à consulter la documentation de Docker, Compose et Traefik. Ell
 
 ### Images officielles et leur documentation
 
-- [Mariadb](https://hub.docker.com/_/mariadb)
+- [PostGreSQL](https://hub.docker.com/_/postgres)
 - [Apache HTTP Server](https://hub.docker.com/_/httpd)
 - [Adminer](https://hub.docker.com/_/adminer)
 - [Apache PHP](https://hub.docker.com/_/php/)

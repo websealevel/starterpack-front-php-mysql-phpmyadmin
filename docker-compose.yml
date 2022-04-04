@@ -37,18 +37,17 @@ services:
     #Nous donne les droits en ecriture au volume (par défaut donné à root, pas cool)
     user: "${UID}:${GID}"
 
-  #Le serveur de la base de données mariadb
+  #Le serveur de la base de données postgres
   db:
-    image: mariadb:10.8-rc
+    image: postgres:14.2
     environment:
-      MARIADB_USER: 'user'
-      MARIADB_PASSWORD: 'password'
-      MARIADB_ROOT_PASSWORD: 'root'
-      MARIADB_DATABASE: 'mydb'
+      POSTGRES_USER: 'user'
+      POSTGRES_PASSWORD: 'password'
+      POSTGRES_DB: 'mydb'
     restart: always
     container_name: ${PROJECT_NAME}-db
     volumes:
-      - ./mariadb-data:/var/lib/mysql
+      - ./postgres-data:/var/lib/mysql
       - ./init:/docker-entrypoint-initdb.d
     networks:
       - project_php

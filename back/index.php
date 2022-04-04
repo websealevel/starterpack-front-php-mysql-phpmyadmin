@@ -6,7 +6,7 @@
 //Configuration accès à la base de donnée
 $db = "mydb";
 $dbhost = "db";
-$dbport = 3306;
+$dbport = 5432;
 $dbuser = "user";
 $dbpasswd = "password";
 
@@ -17,7 +17,7 @@ header("Content-Type: application/json");
 
 //Ping la base de données
 try {
-    $pdo = new PDO('mysql:host=' . $dbhost . ';port=' . $dbport . ';dbname=' . $db . '', $dbuser, $dbpasswd);
+    $pdo = new PDO('pgsql:host=' . $dbhost . ';port=' . $dbport . ';dbname=' . $db . '', $dbuser, $dbpasswd);
     echo json_encode(array('La connexion à la base de données a réussi !'));
 } catch (PDOException $e) {
     echo json_encode(array('La connexion a la base de données a échoué :('));
