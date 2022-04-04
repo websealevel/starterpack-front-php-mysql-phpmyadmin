@@ -40,7 +40,7 @@
     - [Images officielles et leur documentation](#images-officielles-et-leur-documentation)
     - [Autres](#autres)
 
-Un starterpack c'est un projet à l'état initial où les cables sont tirés. C'est pratique car on peut le dupliquer pour commencer rapidement un nouveau projet. On galère **une fois** à mettre l'environnement en place et puis après on est tranquille. On peut le faire évoluer ensuite. Pour cela je recommande de faire un dépot qui contient ce starterpack. A chaque fois qu'on relance un projet on le duplique et on fait un dépôt pour ce projet. Voilà un petit workflow sympathique. On documente bien aussi son starterpack, comme ça si on revient dans 1 mois on peut se souvenir de ce qu'on a fait et pourquoi on a fait les choses comme ça. Soyons sympas envers nous même, et les autres.
+Un starterpack c'est un projet à l'état initial où les câbles sont tirés. C'est pratique car on peut le dupliquer pour commencer rapidement un nouveau projet. On galère **une fois** à mettre l'environnement en place et puis après on est tranquille. On peut le faire évoluer ensuite. Pour cela je recommande de faire un dépot qui contient ce starterpack. A chaque fois qu'on relance un projet on le duplique et on fait un dépôt pour ce projet. Voilà un petit workflow sympathique. On documente bien aussi son starterpack, comme ça si on revient dans 1 mois on peut se souvenir de ce qu'on a fait et pourquoi on a fait les choses comme ça. Soyons sympas envers nous même, et les autres.
 
 ## Pas le temps ou l'envie, je suis pressé de l'utiliser
 
@@ -48,7 +48,7 @@ Si vous voulez directement utiliser ce starterpack sans vous soucier des détail
 
 ## Docker au lieu de LAMP, être machine indépendant
 
-LAMP c'est bien mais c'est machine-dépendant, c'est galère. On doit installer et configurer des choses directement sur notre machine locale. J'aime pas trop bidouiller ma machine locale pour faire marcher un projet. Qui dit que je ne devrais pas la rebidouiller pour un autre et que ces changements ne casseront pas la config du projet précédent ? Pour ces raisons, on va utiliser [Docker](https://docs.docker.com/). Rien ne sera installé sur notre machine (seulement une petite config qui passera inaperçue): on reste clean et en plus notre projet _est garanti_ (normalement) de marcher sur toute machine capable de faire tourner Docker.
+[LAMP](https://fr.wikipedia.org/wiki/LAMP) c'est bien mais c'est machine-dépendant, c'est galère. On doit installer et configurer des choses directement sur notre machine locale. J'aime pas trop bidouiller ma machine locale pour faire marcher un projet. Qui dit que je ne devrais pas la rebidouiller pour un autre et que ces changements ne casseront pas la config du projet précédent ? Pour ces raisons, on va utiliser [Docker](https://docs.docker.com/). Rien ne sera installé sur notre machine (seulement une petite config qui passera inaperçue): on reste clean et en plus notre projet _est garanti_ (normalement) de marcher sur toute machine capable de faire tourner Docker.
 
 ## Docker-compose s'impose
 
@@ -64,14 +64,18 @@ Définissons nos _services_, c'est à dire nos conteneurs Docker ainsi que les r
 
 #### Un backend
 
-Tout d'abord on a besoin d'un serveur backend avec PHP d'installé dessus. C'est le but du service `back`. J'ai choisi une image apache avec PHP 8. Sur Apache, le programme serveur sert par défaut les sources présentes dans le dossier `/var/www/html`. Nous on veut servir le contenu du dossier `back` à la racine du projet. Donc on utilise les `volumes` de Docker pour rewrite le path et le faire correspondre à notre dossier avec
+Tout d'abord on a besoin d'un serveur backend avec PHP d'installé dessus. C'est le but du service `back`. J'ai choisi une image Apache avec PHP 8. Sur Apache, le programme serveur sert par défaut les sources présentes dans le dossier `/var/www/html`. Nous on veut servir le contenu du dossier `back` à la racine du projet. Donc on utilise les `volumes` de Docker pour rewrite le path et le faire correspondre à notre dossier avec
 
-    volumes:
-      - ./back/:/var/www/html/:rw
+~~~yaml
+volumes:
+  - ./back/:/var/www/html/:rw
+~~~
 
 Sous Linux, par défaut le contenu dockerisé (ici notre dossier `back`) appartient en écriture à l'utilisateur `root`. On veut éviter cela. Et pour cela il y a une ligne de configuration importante c'est
 
-    user: "${UID}:${GID}"
+~~~bash
+user: "${UID}:${GID}"
+~~~
 
 `UID` et `GID` sont des variables d'environnement définies dans le `.env`. Par défaut notre utilisateur est `1000` et son groupe est `1000`. Pour vous en assurer taper la commande `id` dans votre terminal. De cette manière on donne les droits d'écriture à notre utilisateur sur le volume monté par Docker et on aura plus de soucis pour éditer les sources servies.
 
@@ -91,6 +95,8 @@ On renseigne ici les valeurs des variables d'environnement [mises à disposition
 ~~~yaml
     volumes: - ./postgres-data:/var/lib/postgresql/data/
 ~~~
+
+Au moment du lancement du conteneur Docker va créer automatiquement le dossier `postgres-data` à la racine du projet et maper ce path au path par défaut de PostegreSQL. Ici on s'est pas donné la peine de donner les droits à l'utilisateur `UID` donc ce volume appartiendra à `root`. Ce n'est pas gênant pour la base de données car on devrait pas à avoir à modifier les fichiers dedans à la main.
 
 #### [Adminer](https://www.adminer.org/), un client de base de données léger et sécurisé
 
@@ -120,6 +126,7 @@ Bien, maintenant que nos services sont individuellement prêts et tous sur le m�
 - `back` doit acceder à `db`
 - `adminer` doit acceder à `db`
 - `front` doit acceder à `back`
+- `front` **ne doit pas accéder** à `db`
 
 On va mettre tous nos conteneurs sur le réseau `web` qui a été crée pour que le conteneur Traefik puisse communiquer avec tous nos conteneurs. Nous verrons cela à la section [suivante](#résoudre-tous-ces-problèmes-dns-local-et-reverse-proxy).
 
