@@ -557,4 +557,3 @@ Ne pas hésiter à consulter la documentation de [Docker](https://docs.docker.co
 - [Networking in Compose](https://docs.docker.com/compose/networking/)
 - [Networking with standalone containers](https://docs.docker.com/network/network-tutorial-standalone/)
 - [Les concepts pour comprendre Traefik](https://doc.traefik.io/traefik/getting-started/concepts/)
-- [Docker Tip - How to use the host's IP Address inside a Docker container on macOS, Windows, and Linux](https://dev.to/natterstefan/docker-tip-how-to-get-host-s-ip-address-inside-a-docker-container-5anh)
