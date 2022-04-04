@@ -37,6 +37,8 @@
     - [Gestion multiprojets](#gestion-multiprojets)
   - [Aller plus loin](#aller-plus-loin)
   - [Références](#références)
+    - [Images officielles et leur documentation](#images-officielles-et-leur-documentation)
+    - [Autres](#autres)
 
 Un starterpack c'est un projet à l'état initial où les cables sont tirés. C'est pratique car on peut le dupliquer pour commencer rapidement un nouveau projet. On galère une fois à mettre l'environnement en place et puis après on est tranquille. On peut le faire évoluer ensuite. Pour cela je recommande de faire un dépot qui contient ce starterpack. A chaque fois qu'on relance un projet on le duplique et on fait un dépôt pour ce projet. Et voilà un petit workflow sympathique. On documente bien aussi le starterpack, comme ça si on revient dans 1 mois on peut se souvenir de ce qu'on a fait et pourquoi on a fait les choses comme ça. Soyons sympas envers nous même, et les autres.
 
@@ -528,6 +530,13 @@ Have fun.
 ## Références
 
 Ne pas hésiter à consulter la documentation de Docker, Compose et Traefik. Elles sont bien faites.
+
+### Images officielles et leur documentation
+
+- [Mariadb](https://hub.docker.com/_/mariadb)
+- 
+
+### Autres
 
 - [Les volumes de Docker](https://docs.docker.com/storage/volumes/)
 - [Get started with Docker Compose](https://docs.docker.com/compose/gettingstarted/)
