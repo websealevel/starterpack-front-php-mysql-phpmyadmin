@@ -518,9 +518,9 @@ Pas de questions, pas d'explications. On va droit au but.
 ](https://github.com/websealevel/starterpack-front-php8-postgresql-adminer)
    1. Configurer un projet en executant le script bash `init-project.sh {nom-de-votre-projet}` à la racine du dépot. Le script va configurer le projet et remplacer la valeur `{nom-de-votre-projet}` partout où il faut. Il va créer également les images Docker et lancer les conteneurs.
    2. Accéder à vos services :
-      1. `front.${PROJECT_NAME}.test` pour acceder au backend
+      1. `front.${PROJECT_NAME}.test` pour acceder au backend. Tester que tout fonctionne bien en soumettant le formulaire. Il requête le service `back` qui lui même requête le service `db`. On fait d'une pierre trois coups.
       2. `back.${PROJECT_NAME}.test` pour acceder au frontend
-      3. `adminer.${PROJECT_NAME}.test` pour acceder à adminer et à la base de données. Logger vous avec l'utilisateur `root` (mot de passe `root`)
+      3. `adminer.${PROJECT_NAME}.test` pour acceder à adminer et à la base de données. Logger vous avec l'utilisateur `user` (mot de passe `password`), définis dans `docker-compose.yml`
 
 ### Démonter le projet
 
@@ -528,19 +528,19 @@ Démontez le projet avec `docker-compose down` à la racine du dépôt.
 
 ### Gestion multiprojets
 
-Montez un autre projet en dupliquant/clonant le starterpack. Ne répétez pas les étapes 1 à 3. Reprenez à l'étape 4.
+Montez un autre projet en dupliquant/clonant le starterpack. Ne répétez pas les étapes 1 à 3. Reprenez à l'étape 4 en utilisant un autre nom de projet qui fait office de nom de domaine, ou plus précisement de *sous-domaine* du domaine `.test`.
 
 ## Aller plus loin
 
 Voilà, en espérant que cette config vous apporte satisfaction pour vos projets de développement. La première fois c'est galère mais après c'est la tranquilité totale pour gérer plusieurs projets sur notre machine locale.
 
-On pourrait enrichir ce starterpack de beaucoup de manières, mais ce sera le sujet peut être d'un autre article. On pourrait commencer par automatiser les dernières petites taches via un script. Je pense également à l'installation de modules pour PHP, ou alors rajouter un service pour intercepter les mails etc... Affaire à suivre.
+On pourrait enrichir ce starterpack de beaucoup de manières. On pourrait commencer par automatiser les dernières petites taches via un script. Je pense également à l'installation de modules pour PHP, ou alors rajouter un service pour intercepter les mails etc... Le starter est amené à évoluer.
 
 Have fun.
 
 ## Références
 
-Ne pas hésiter à consulter la documentation de Docker, Compose et Traefik. Elles sont bien faites.
+Ne pas hésiter à consulter la documentation de [Docker](https://docs.docker.com/), [Compose](https://docs.docker.com/compose/) et [Traefik](https://doc.traefik.io/traefik/). Elles sont bien faites.
 
 ### Images officielles et leur documentation
 
