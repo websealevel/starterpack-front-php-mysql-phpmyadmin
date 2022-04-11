@@ -519,8 +519,8 @@ Pas de questions, pas d'explications. On va droit au but.
 ](https://github.com/websealevel/starterpack-front-php8-postgresql-adminer)
    1. Configurer un projet en executant le script bash `init-project.sh {nom-de-votre-projet}` à la racine du dépot. Le script va configurer le projet et remplacer la valeur `{nom-de-votre-projet}` partout où il faut. Il va créer également les images Docker et lancer les conteneurs.
    2. Accéder à vos services :
-      1. `front.${PROJECT_NAME}.test` pour acceder au backend. Tester que tout fonctionne bien en soumettant le formulaire. Il requête le service `back` qui lui même requête le service `db`. On fait d'une pierre trois coups.
-      2. `back.${PROJECT_NAME}.test` pour acceder au frontend
+      1. `front.${PROJECT_NAME}.test` pour acceder au frontend. Tester que tout fonctionne bien en soumettant le formulaire. Il requête le service `back` qui lui même requête le service `db`. On fait d'une pierre trois coups
+      2. `back.${PROJECT_NAME}.test` pour acceder au backend
       3. `adminer.${PROJECT_NAME}.test` pour acceder à adminer et à la base de données. Logger vous avec l'utilisateur `user` (mot de passe `password`), définis dans `docker-compose.yml`
 
 ### Démonter le projet
