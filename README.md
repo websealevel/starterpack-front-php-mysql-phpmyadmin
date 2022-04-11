@@ -278,7 +278,7 @@ Pour y parvenir, on va se servir d'un serveur dns local et d'un reverse-proxy. O
 
 Pour mettre en place ce système on va avoir besoin de conteneurs Docker car on va conteneurisé le reverse proxy (et oui, encore, le minimum sur notre machine). Pour cela, on va créer un nouveau dépôt en dehors de notre starterpack. **Un projet, un dépôt**, c'est la règle. Ce projet vivra sa vie de manière *indépendante* sur votre machine et pourra servir à tous vos projets en local et non seulement à ceux réalisés avec votre starterpack. Quand on l'aura cablé, on le lancera une fois pour toute et vous n'y retoucherez plus jamais (dans un monde idéal).
 
-Créer donc un autre dépôt sur votre machine, par exemple `local-env-docker` et allons-y.
+Créer donc un autre dépôt sur votre machine, par exemple `local-env-docker` et allons-y. Vous pouvez également visiter [ce dépôt](https://github.com/websealevel/local-env-docker) hebergeant la configuration de traefik prête à l'emploi.
 
 #### Mise en place d'un dns local avec `dnsmasq`
 
